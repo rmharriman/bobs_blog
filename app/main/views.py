@@ -1,16 +1,28 @@
-from flask import render_template, session, redirect, url_for, current_app
-from flask_login import login_required, current_user
+from flask import render_template, session, redirect, url_for, current_app, abort, flash
+from flask_login import login_required, current_user 
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm
 from .. import db
-from ..models import User, Role
+from ..models import User, Role, Post, Permission
 from ..decorators import admin_required
 
 
 # Important to remember route decorator comes from the bp not app
 @main.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.html")
+    form = PostForm()
+    if current_user.can(Permission.WRITE_ARTICLES) and \
+            form.validate_on_submit():
+        post = Post(body=form.body.data, 
+                    # Need to use _get_current_object() method of current_user
+                    # Current_user actually contains a thin wrapper of user object
+                    # All context variables are implemented as thread-local proxy objects
+                    # The wrapped object is needed by the database
+                    author=current_user._get_current_object())
+        db.session.add(post)
+        return redirect(url_for(".index"))
+    posts = Post.query.order_by(Post.timestamp.desc()).all()
+    return render_template("index.html", form=form, posts=posts)
 
 @main.route("/user/<username>")
 def user(username):
