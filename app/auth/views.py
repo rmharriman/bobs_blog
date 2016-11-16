@@ -175,4 +175,3 @@ def change_email(token):
     else:
         flash('Invalid request.')
     return redirect(url_for('main.index'))
-    

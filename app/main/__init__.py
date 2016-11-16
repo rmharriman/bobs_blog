@@ -12,6 +12,7 @@ main = Blueprint("main", __name__)
 from . import views, errors
 from ..models import Permission
 
+
 # Context processors can be used to make variables available globally to all templates
 @main.app_context_processor
 def inject_permissions():
