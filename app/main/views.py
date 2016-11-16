@@ -29,7 +29,9 @@ def user(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)
-    return render_template("user.html", user=user)
+    # Posts is a query object (dynamic loading) so filters and order by can be used
+    posts = user.posts.order_by(Post.timestamp.desc()).all()
+    return render_template("user.html", user=user, posts=posts)
 
 @main.route("/edit-profile", methods=["GET", "POST"])
 @login_required
