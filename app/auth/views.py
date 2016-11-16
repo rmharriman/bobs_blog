@@ -11,10 +11,12 @@ from ..email import send_email
 @auth.before_app_request
 def before_request():
     # intercepts users who have not confirmed but can log in, does nothing otherwise
-    if current_user.is_authenticated \
-            and not current_user.confirmed \
-            and request.endpoint != "static" \
-            and request.endpoint[:5] != "auth.":
+    if current_user.is_authenticated:
+        # This intercepts all requests, so good place to call ping and update last seen
+        current_user.ping()
+        if not current_user.confirmed \
+           and request.endpoint != "static" \
+           and request.endpoint[:5] != "auth.":
             return redirect(url_for("auth.unconfirmed"))
 
 
@@ -173,4 +175,3 @@ def change_email(token):
     else:
         flash('Invalid request.')
     return redirect(url_for('main.index'))
-    
