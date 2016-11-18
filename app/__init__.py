@@ -5,6 +5,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from flask_pagedown import PageDown
 from config import config
 
 # then creates them uninitialized (no app as arg)
@@ -13,6 +14,7 @@ mail = Mail()
 moment = Moment()
 db = SQLAlchemy()
 login_manager = LoginManager()
+pagedown = PageDown()
 # session protection setting changes what is stored for the session to try to prevent user tampering
 # strong stores client's ip, user agent and logs user out if there is a change
 login_manager.session_protection = "strong"
@@ -32,6 +34,7 @@ def create_app(config_name):
     mail.init_app(app)
     moment.init_app(app)
     db.init_app(app)
+    pagedown.init_app(app)
     
     # Attach routes and custom error pages
     from app.main import main as main_blueprint
