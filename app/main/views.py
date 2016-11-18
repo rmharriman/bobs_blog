@@ -1,4 +1,4 @@
-from flask import render_template, session, redirect, url_for, current_app, abort, flash
+from flask import render_template, session, redirect, url_for, current_app, abort, flash, request
 from flask_login import login_required, current_user 
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm
@@ -21,8 +21,17 @@ def index():
                     author=current_user._get_current_object())
         db.session.add(post)
         return redirect(url_for(".index"))
-    posts = Post.query.order_by(Post.timestamp.desc()).all()
-    return render_template("index.html", form=form, posts=posts)
+    # pages can be requested in a url parameter, defaults to 1
+    page = request.args.get("page", 1, type=int)
+    # error out of defaults to true (404 for page > n pages) 
+    # Setting error out to False returns an empty list instead
+    # Object of paginate class is returned by paginate method
+    #   has properties good for generating links in template, so it is passed as an arg
+    pagination = Post.query.order_by(Post.timestamp.desc()).paginate(
+                               page, per_page=current_app.config["BLOG_POSTS_PER_PAGE"],
+                                error_out=False)
+    posts = pagination.items
+    return render_template("index.html", form=form, posts=posts, pagination=pagination)                                
 
 @main.route("/user/<username>")
 def user(username):
@@ -39,8 +48,8 @@ def edit_profile():
     form = EditProfileForm()
     if form.validate_on_submit():
         current_user.name = form.name.data
-        current_user.location = form.name.location
-        current_user.about_me = form.name.about_me.data
+        current_user.location = form.location.data
+        current_user.about_me = form.about_me.data
         db.session.add(current_user)
         flash("Your profile has been updated.")
         return redirect(url_for(".user", username=current_user.username))
