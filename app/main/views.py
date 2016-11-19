@@ -1,23 +1,46 @@
-from flask import render_template, session, redirect, url_for, current_app
-from flask_login import login_required, current_user
+from flask import render_template, session, redirect, url_for, current_app, abort, flash, request
+from flask_login import login_required, current_user 
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm
 from .. import db
-from ..models import User, Role
-from ..decorators import admin_required
+from ..models import User, Role, Post, Permission, Follow
+from ..decorators import admin_required, permission_required
 
 
 # Important to remember route decorator comes from the bp not app
 @main.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.html")
+    form = PostForm()
+    if current_user.can(Permission.WRITE_ARTICLES) and \
+            form.validate_on_submit():
+        post = Post(body=form.body.data, 
+                    # Need to use _get_current_object() method of current_user
+                    # Current_user actually contains a thin wrapper of user object
+                    # All context variables are implemented as thread-local proxy objects
+                    # The wrapped object is needed by the database
+                    author=current_user._get_current_object())
+        db.session.add(post)
+        return redirect(url_for(".index"))
+    # pages can be requested in a url parameter, defaults to 1
+    page = request.args.get("page", 1, type=int)
+    # error out of defaults to true (404 for page > n pages) 
+    # Setting error out to False returns an empty list instead
+    # Object of paginate class is returned by paginate method
+    #   has properties good for generating links in template, so it is passed as an arg
+    pagination = Post.query.order_by(Post.timestamp.desc()).paginate(
+                               page, per_page=current_app.config["BLOG_POSTS_PER_PAGE"],
+                                error_out=False)
+    posts = pagination.items
+    return render_template("index.html", form=form, posts=posts, pagination=pagination)                                
 
 @main.route("/user/<username>")
 def user(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)
-    return render_template("user.html", user=user)
+    # Posts is a query object (dynamic loading) so filters and order by can be used
+    posts = user.posts.order_by(Post.timestamp.desc()).all()
+    return render_template("user.html", user=user, posts=posts)
 
 @main.route("/edit-profile", methods=["GET", "POST"])
 @login_required
@@ -25,8 +48,8 @@ def edit_profile():
     form = EditProfileForm()
     if form.validate_on_submit():
         current_user.name = form.name.data
-        current_user.location = form.name.location
-        current_user.about_me = form.name.about_me.data
+        current_user.location = form.location.data
+        current_user.about_me = form.about_me.data
         db.session.add(current_user)
         flash("Your profile has been updated.")
         return redirect(url_for(".user", username=current_user.username))
@@ -60,3 +83,84 @@ def edit_profile_admin(id):
     form.location.data = user.location
     form.about_me.data = user.about_me
     return render_template("edit_profile.html", form=form, user=user)
+
+@main.route("/post/<int:id>")
+def post(id):
+    post = Post.query.get_or_404(id)
+    return render_template("post.html", posts=[post])
+    
+@main.route("/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+def edit(id):
+    post = Post.query.get_or_404(id)
+    if current_user != post.author and \
+            not current_user.can(Permission.ADMINISTER):
+        abort(403)
+    form = PostForm()
+    if form.validate_on_submit():
+        post.body = form.body.data
+        db.session.add(post)
+        flash("The post has been updated.")
+        return redirect(url_for(".post", id=post.id))
+    form.body.data = post.body
+    return render_template("edit_post.html", form=form)
+
+@main.route("/follow/<username>")
+@login_required
+@permission_required(Permission.FOLLOW)
+def follow(username):
+    """Loads requested user and, if it exists, verifies the user is not already being followed, then calls follow()"""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash("Invalid user")
+        return redirect(url_for(".index"))
+    if current_user.is_following(user):
+        flash("You are alredy following this user.")
+        return redirect(url_for(".user", username=username))
+    current_user.follow(user)
+    flash("You are now following %s." % username)
+    return redirect(url_for(".user", username=username))
+
+
+@main.route("/unfollow/<username>")
+@login_required
+@permission_required(Permission.FOLLOW)
+def unfollow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash("Invalid user")
+        return redirect(url_for(".index"))
+    if not current_user.is_following(user):
+        flash("You are not following this user.")
+        return redirect(url_for(".user", username=username))
+    current_user.unfollow(user)
+    flash("You are not following %s anymore." % username)
+    return redirect(url_for(".user", username=username))
+
+
+@main.route("/followers/<username>")    
+def followers(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash("Invalid user")
+        return redirect(url_for(".index"))
+    page = request.args.get("page", 1, type=int)
+    pagination = user.followers.paginate(page, per_page=current_app.config["BLOG_FOLLOWERS_PER_PAGE"],
+                                         error_out=False)
+    follows = [{"user": item.follower, "timestamp": item.timestamp} for item in pagination.items]
+    return render_template("followers.html", user=user, title="Followers of",
+                            endpoint=".followers", pagination=pagination, follows=follows)
+
+@main.route("/followed-by/<username>")    
+def followed_by(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash("Invalid user")
+        return redirect(url_for(".index"))
+    page = request.args.get("page", 1, type=int)
+    pagination = user.followed.paginate(page, per_page=current_app.config["BLOG_FOLLOWERS_PER_PAGE"],
+                                         error_out=False)
+    follows = [{"user": item.followed, "timestamp": item.timestamp} for item in pagination.items]
+    # Uses same template as followers.
+    return render_template("followers.html", user=user, title="Followed by",
+                            endpoint=".followed_by", pagination=pagination, follows=follows)
