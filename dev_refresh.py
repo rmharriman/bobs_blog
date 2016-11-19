@@ -11,21 +11,20 @@ app = create_app(os.getenv("FLASK_CONFIG") or "default")
 manager = Manager(app)
 migrate = Migrate(app, db)
 
+app.app_context().push()
 
-def make_shell_context():
-    return dict(app=app, db=db, User=User, Role=Role, Permission=Permission,
-                Post=Post)
+print("Loading dev db roles")
+Role.insert_roles()
 
-manager.add_command("shell", Shell(make_context=make_shell_context))
-manager.add_command("db", MigrateCommand)
+print("Loading dev db users")
+User.generate_fake()
 
+print("Loading dev db posts")
+Post.generate_fake()
 
-@manager.command
-def test():
-    """Run the unit tests"""
-    import unittest
-    tests = unittest.TestLoader().discover("tests")
-    unittest.TextTestRunner(verbosity=2).run(tests)
-
-if __name__ == "__main__":
-    manager.run()
+def create_admin_account():
+    user = User(email="rmharriman@gmail.com", password="cat", confirmed=True, username="Rob")
+    db.session.add(user)
+    db.session.commit()
+print("Creating admin account")
+create_admin_account()
