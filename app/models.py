@@ -84,7 +84,7 @@ class User(UserMixin, db.Model):
                         
     
     @staticmethod
-    def generate_fake(count=100):
+    def generate_fake(count=50):
         from sqlalchemy.exc import IntegrityError
         from random import seed
         import forgery_py

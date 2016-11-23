@@ -23,22 +23,15 @@
 			      {% endif %}
 			    {% endif %}
 			</div>
-	
 			 {% if moderate %}
-			   <br>
-			   {% if comment.disabled %}
+			 	<br>
+			   {% if comment.disable %}
 			   <a class="btn btn-default btn-xs" href="{{ url_for('.moderate_enable', id=comment.id, page=page) }}">Enable</a>
 			   {% else %}
 			   <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=comment.id, page=page) }}">Disable</a>
 			   {% endif %}
-	         {% endif %}
-
-		     {% if comment.body_html %}
-              {{ comment.body_html | safe }}
-             {% else %}
-              {{ comment.body }}
              {% endif %}
-            </div>
+
         </div>
     </li>
     {% endfor %}
