@@ -1,4 +1,5 @@
-from flask import render_template, session, redirect, url_for, current_app, abort, flash, request
+from flask import render_template, session, redirect, url_for, \
+                    current_app, abort, flash, request, make_response
 from flask_login import login_required, current_user 
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm
@@ -23,15 +24,23 @@ def index():
         return redirect(url_for(".index"))
     # pages can be requested in a url parameter, defaults to 1
     page = request.args.get("page", 1, type=int)
-    # error out of defaults to true (404 for page > n pages) 
+    show_followed = False
+    if current_user.is_authenticated:
+        show_followed = bool(request.cookies.get("show_followed", ""))
+    if show_followed:
+        query = current_user.followed_posts
+    else:
+        query = Post.query
+    # error out defaults to true (404 for page > n pages) 
     # Setting error out to False returns an empty list instead
     # Object of paginate class is returned by paginate method
     #   has properties good for generating links in template, so it is passed as an arg
-    pagination = Post.query.order_by(Post.timestamp.desc()).paginate(
-                               page, per_page=current_app.config["BLOG_POSTS_PER_PAGE"],
-                                error_out=False)
+    pagination = query.order_by(Post.timestamp.desc()).paginate(
+            page, per_page=current_app.config["BLOG_POSTS_PER_PAGE"],
+            error_out=False)
     posts = pagination.items
-    return render_template("index.html", form=form, posts=posts, pagination=pagination)                                
+    return render_template("index.html", form=form, posts=posts,
+                           show_followed=show_followed, pagination=pagination)                                
 
 @main.route("/user/<username>")
 def user(username):
@@ -164,3 +173,17 @@ def followed_by(username):
     # Uses same template as followers.
     return render_template("followers.html", user=user, title="Followed by",
                             endpoint=".followed_by", pagination=pagination, follows=follows)
+                            
+@main.route("/all")
+@login_required
+def show_all():
+    resp = make_response(redirect(url_for(".index")))
+    resp.set_cookie("show_followed", "", max_age=30*24*60*60)
+    return resp
+
+@main.route("/followed")
+@login_required
+def show_followed():
+    resp = make_response(redirect(url_for(".index")))
+    resp.set_cookie("show_followed", "1", max_age=30*24*60*60)
+    return resp
