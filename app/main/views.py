@@ -108,8 +108,9 @@ def post(id):
     # special page of -1 means get the last page of comments
     # Calculation is done to determine actual page number to use based on number of comments
     if page == -1:
-        page = (post.comments.count() - 1) / \
+        page = (post.comments.count() - 1) // \
         current_app.config["BLOG_COMMENTS_PER_PAGE"] + 1
+        print(page)
     # sorting by asc puts new comments at the bottom of the list (usual behavior of comment lists)
     pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(
         page, per_page=current_app.config["BLOG_COMMENTS_PER_PAGE"], 
