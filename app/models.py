@@ -116,7 +116,9 @@ class User(UserMixin, db.Model):
         if self.email is not None and self.avatar_hash is None:
             # Good idea to cache the hash as it is a CPU intensive operation
             self.avatar_hash = hashlib.md5(self.email.encode("utf-8")).hexdigest()
-    
+        
+        self.follow(self)
+        
     def generate_confirmation_token(self, expiration=3600):
         s = Serializer(current_app.config["SECRET_KEY"], expiration)
         return s.dumps({"confirm": self.id})
@@ -212,7 +214,7 @@ class User(UserMixin, db.Model):
     # Helper functions for common following activities
     def follow(self, user):
         if not self.is_following(user):
-            f = Follow(followed=user)
+            f = Follow(follower=self, followed=user)
             self.followed.append(f)
             
     def unfollow(self, user):
@@ -228,6 +230,11 @@ class User(UserMixin, db.Model):
     
     def __repr__(self):
         return "<User %r>" % self.username
+    
+    @property
+    def followed_posts(self):
+        return Post.query.join(Follow, Follow.followed_id == Post.author_id) \
+            .filter(Follow.follower_id == self.id)
             
 
 class Permission:
