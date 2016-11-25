@@ -237,6 +237,21 @@ class User(UserMixin, db.Model):
         return Post.query.join(Follow, Follow.followed_id == Post.author_id) \
             .filter(Follow.follower_id == self.id)
             
+    def generate_auth_token(self, expiration):
+        s = Serializer(current_app.config["SECRET_KEY"],
+                       expires_in=expiration)
+
+        return s.dumps({"id": self.id})
+        
+    @staticmethod
+    def verify_auth(token):
+        s = Serializer(current_app.config["SECRET_KEY"])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return User.query.get(data["id"])
+            
 
 class Permission:
     FOLLOW = 0x01
