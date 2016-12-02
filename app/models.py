@@ -7,7 +7,7 @@ from markdown import markdown
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
-from app.exception import ValidationError
+from app.exceptions import ValidationError
 
 
 # SQLAlchemy provides a baseclass with a set of helper functions to inherit
@@ -262,7 +262,7 @@ class User(UserMixin, db.Model):
             "timestamp": self.timestamp,
             "posts": url_for("api.get_user_posts", id=self.id, _external=True),
             "followed_posts": url_for("api.get_user_followed_posts",
-                              id=self.id, _external=True)
+                              id=self.id, _external=True),
             "post_count": self.posts.count()
         }
         return json_user
