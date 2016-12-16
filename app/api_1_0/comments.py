@@ -24,9 +24,9 @@ def get_comments():
         "next": next,
         "count": pagination.total
     })
-    
+
+
 @api.route("/comments/<int:id>")
 def get_comment(id):
     comment = Comment.query.get_or_404(id)
     return jsonify({"comment": comment.to_json()})
-    
