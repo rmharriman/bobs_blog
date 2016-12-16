@@ -22,9 +22,11 @@ def verify_password(email_or_token, password):
     g.current_user = user
     return user.verify_password(password)
 
+
 @auth.error_handler
 def auth_error():
     return unauthorized("Invalid credentials")
+
 
 @api.before_request
 @auth.login_required
@@ -33,7 +35,7 @@ def before_request():
     # for every request. No need to protect each view function with login_required
     # Also can check if the user is able to log in but has yet to confirm account on every request
     if not g.current_user.is_anonymous and \
-        not g.current_user.confirmed:
+       not g.current_user.confirmed:
         return forbidden("Unconfirmed account")
 
 
