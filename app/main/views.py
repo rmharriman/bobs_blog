@@ -8,6 +8,11 @@ from ..models import User, Role, Post, Permission, Follow, Comment
 from ..decorators import admin_required, permission_required
 
 
+@main.route("/api_test")
+def api_test():
+    return render_template("api_test.html")
+
+
 # Important to remember route decorator comes from the bp not app
 @main.route("/", methods=["GET", "POST"])
 def index():
