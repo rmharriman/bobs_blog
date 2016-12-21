@@ -255,14 +255,13 @@ class User(UserMixin, db.Model):
     
     def to_json(self):
         json_user = {
-            "url" : url_for("api.get_user", id=self.id, _external=True),
+            "url": url_for("api.get_user", id=self.id, _external=True),
             "username": self.username,
             "member_since": self.member_since,
             "last_seen": self.last_seen,
-            "timestamp": self.timestamp,
             "posts": url_for("api.get_user_posts", id=self.id, _external=True),
             "followed_posts": url_for("api.get_user_followed_posts",
-                              id=self.id, _external=True),
+                                      id=self.id, _external=True),
             "post_count": self.posts.count()
         }
         return json_user
@@ -332,13 +331,13 @@ class Post(db.Model):
     def to_json(self):
         # Comment count is "made-up" attribute. Shows a technique to add resource attributes without storing them.
         json_post = {
-            "url" : url_for("api.get_post", id=self.id, _external=True),
-            "body" : self.body,
-            "html_body" : self.html_body,
-            "timestamp" : self.timestamp,
-            "author" : url_for("api.get_user", id=self.author_id, _external=True),
-            "comments" : url_for("api.get_post_comments", id=self.id, _external=True),
-            "comment_count" : self.comments.count()
+            "url": url_for("api.get_post", id=self.id, _external=True),
+            "body": self.body,
+            "body_html": self.body_html,
+            "timestamp": self.timestamp,
+            "author": url_for("api.get_user", id=self.author_id, _external=True),
+            "comments": url_for("api.get_post_comments", id=self.id, _external=True),
+            "comment_count": self.comments.count()
         }
         return json_post
 
