@@ -4,14 +4,14 @@
 function Menu(elem) {
     this.onUsers = function() {
         var request = new XMLHttpRequest();
-        request.open('GET', 'http://localhost:5000/api/v1.0/token', true);
+        request.open('GET', 'http://localhost:5000/api/v1.0/posts/', true);
         request.setRequestHeader("Authorization", "Basic " + btoa("rmharriman@gmail.com:cat"));
         request.onload = function() {
             if (this.status >= 200 && this.status < 400) {
                 // Success!
                 var data = JSON.parse(this.response);
                 console.log(data);
-                console.log("in success block");
+
             }
             else {
             // We reached our target server, but it returned an error
