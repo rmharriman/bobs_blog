@@ -14,7 +14,6 @@ def verify_password(email_or_token, password):
         return True
     if password == "":
         g.current_user = User.verify_auth_token(email_or_token)
-        current_app.logger.debug("i'm here!")
         g.token_used = True
         return g.current_user is not None
     user = User.query.filter_by(email=email_or_token).first()
