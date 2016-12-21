@@ -17,6 +17,7 @@ class Config():
     BLOG_POSTS_PER_PAGE = 25
     BLOG_FOLLOWERS_PER_PAGE = 25
     BLOG_COMMENTS_PER_PAGE = 10
+
     @staticmethod
     def init_app(app):
         pass

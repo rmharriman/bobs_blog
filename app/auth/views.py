@@ -32,7 +32,7 @@ def login():
     form = LoginForm()
     # Executes on a properly submitted form (POST)
     if form.validate_on_submit():
-        # begin authentication by trying to load user by email
+        # begin authentication.py by trying to load user by email
         user = User.query.filter_by(email=form.email.data).first()
         # if user is not found or password check fails, the user is not logged in 
         if user is not None and user.verify_password(form.password.data):

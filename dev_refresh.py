@@ -22,6 +22,7 @@ User.generate_fake()
 print("Loading dev db posts")
 Post.generate_fake()
 
+
 def create_admin_account():
     user = User(email="rmharriman@gmail.com", password="cat", confirmed=True, username="Rob")
     db.session.add(user)
