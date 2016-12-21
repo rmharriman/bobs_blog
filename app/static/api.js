@@ -12,6 +12,7 @@ function Menu(elem) {
                 // Success!
                 var data = JSON.parse(this.response);
                 console.log(data)
+                console.log("in success block")
             }
             else {
             // We reached our target server, but it returned an error
