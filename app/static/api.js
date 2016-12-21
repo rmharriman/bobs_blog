@@ -4,7 +4,7 @@
 function Menu(elem) {
     this.onUsers = function() {
         var request = new XMLHttpRequest();
-        request.open('GET', 'http://localhost:5000/api/v1.0/posts/1', true);
+        request.open('GET', 'http://localhost:5000/api/v1.0/users/1', true);
         request.setRequestHeader("Authorization", "Basic" + btoa("rmharriman@gmail.com:cat"));
         request.onload = function() {
             if (this.status >= 200 && this.status < 400) {
