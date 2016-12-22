@@ -6,16 +6,22 @@ var token;
 
 function buildTable(userList) {
     var table = document.createElement("table");
-    var header = table.createTHead();
-    var row = header.insertRow(0);
-    var cell = row.insertCell(0);
-    cell.innerHTML = "Users";
 
     for (var user of userList) {
-        var userRow = table.insertRow(-1);
-        var userData = userRow.insertCell(0);
-        userData.innerHTML = user.username;
+		console.log(user.post_count)
+        var userRow = table.insertRow();
+        var userData = userRow.insertCell();
+        userData.appendChild(document.createTextNode(user.username));
+		var postCount = userRow.insertCell();
+		postCount.appendChild(document.createTextNode(user.post_count));
     }
+	var header = table.createTHead();
+    var row = header.insertRow();
+    var cell1 = row.insertCell();
+    cell1.innerHTML = "Users";
+	var cell2 = row.insertCell();
+	cell2.innerHTML = "Count";
+	
     return table;
 }
 
