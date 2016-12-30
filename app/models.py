@@ -242,10 +242,10 @@ class User(UserMixin, db.Model):
         s = Serializer(current_app.config["SECRET_KEY"],
                        expires_in=expiration)
 
-        return s.dumps({"id": self.id})
+        return s.dumps({"id": self.id}).decode("ascii")
         
     @staticmethod
-    def verify_auth(token):
+    def verify_auth_token(token):
         s = Serializer(current_app.config["SECRET_KEY"])
         try:
             data = s.loads(token)

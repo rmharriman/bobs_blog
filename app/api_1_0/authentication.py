@@ -1,4 +1,4 @@
-from flask import g, jsonify, current_app
+from flask import g, jsonify
 from flask_httpauth import HTTPBasicAuth
 from ..models import User, AnonymousUser
 from . import api
@@ -9,8 +9,6 @@ auth = HTTPBasicAuth()
 
 @auth.verify_password
 def verify_password(email_or_token, password):
-    current_app.logger.debug(email_or_token)
-    current_app.logger.debug(password)
     if email_or_token == "":
         g.current_user = AnonymousUser()
         return True
@@ -22,6 +20,7 @@ def verify_password(email_or_token, password):
     if not user:
         return False
     g.current_user = user
+    g.token_used = False
     return user.verify_password(password)
 
 
