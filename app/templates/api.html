@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <script src="https://use.fontawesome.com/c4a0068170.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='api.css') }}">
+    <title>API Testing</title>
+{% endblock %}
+
+{% block page_content %}
+
+   <div id="menu">
+    <button data-action="Users">Click to get users</button>
+    <button data-action="Posts">Click to get posts</button>
+   </div>
+	
+   <div class"col-sm-4">Hello</div>
+   <div id="users" class="col-sm-8"> Users List</div>
+
+  </body>
+
+  <script src="{{ url_for('static', filename='api.js') }}"></script>
+{% endblock %}
