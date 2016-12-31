@@ -1,4 +1,6 @@
+import re
 import threading
+import time
 import unittest
 from selenium import webdriver
 from app import db, create_app
@@ -33,26 +35,29 @@ class SeleniumTestCase(unittest.TestCase):
             db.create_all()
             Role.insert_roles()
             User.generate_fake(10)
-            Post.generaate_fake(10)
+            Post.generate_fake(10)
             
             # add an admin user
-            admin_role = Role.query.filter_by(permission=0xff).first()
-            admin = User(email="jonh@example.com",
+            admin_role = Role.query.filter_by(permissions=0xff).first()
+            admin = User(email="john@example.com",
                          username="john",
                          password="cat",
-                         roel=admin_role, confirmed=True)
+                         role=admin_role, confirmed=True)
             db.session.add(admin)
             db.session.commit()
             
             # start the Flask server in a thread
             threading.Thread(target=cls.app.run).start()
+            
+            # give the server a second to start
+            time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):
         if cls.client:
             # stop the flask server and the browser
             cls.client.get("http://localhost:5000/shutdown")
-            cls.client.close()
+            cls.client.quit()
             
             # destroy database
             db.drop_all()
@@ -75,14 +80,17 @@ class SeleniumTestCase(unittest.TestCase):
         
         # navigate to the login page
         self.client.find_element_by_link_text("Log In").click()
+        time.sleep(1)
         self.assertTrue("<h1>Login</h1>" in self.client.page_source)
         
         # login
         self.client.find_element_by_name("email").send_keys("john@example.com")
         self.client.find_element_by_name("password").send_keys("cat")
         self.client.find_element_by_name("submit").click()
+        time.sleep(1)
         self.assertTrue(re.search("Hello,\s+john!", self.client.page_source))
         
         # navigate to the user's profile page
         self.client.find_element_by_link_text("Profile").click()
-        self.assertTrue("<h1>Login</h1>" in self.client.page_source)
+        time.sleep(1)
+        self.assertTrue("<h1>john</h1>" in self.client.page_source)
