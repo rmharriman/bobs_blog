@@ -1,5 +1,6 @@
 from functools import wraps
-
+from flask import g
+from .errors import forbidden
 
 def permission_required(permission):
     def decorator(f):
