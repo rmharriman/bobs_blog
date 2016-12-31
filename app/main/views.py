@@ -8,6 +8,18 @@ from ..models import User, Role, Post, Permission, Follow, Comment
 from ..decorators import admin_required, permission_required
 
 
+@main.route("/shutdown")
+def server_shutdown():
+    # checks if current app is running in the testing environment
+    if not current_app.testing:
+        abort(404)
+    shutdown = request.environ.get("werkzeug.server.shutdown")
+    if not shutdown:
+        abort(500)
+    shutdown()
+    return "Shutting down..."
+
+
 @main.route("/api_test")
 def api_test():
     return render_template("api_test.html")
