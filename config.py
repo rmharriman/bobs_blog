@@ -6,6 +6,7 @@ class Config():
     SECRET_KEY = os.environ.get("SECRET_KEY") or "rreeaasskkggheeiiillsskskskdk"
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_RECORD_QUERIES = True
     BLOG_MAIL_SUBJECT_PREFIX = "Bob's Bytes"
     BLOG_MAIL_SENDER = "BOB <bob@bbb.com"
     BLOG_ADMIN = os.environ.get("BLOG_ADMIN")
@@ -17,7 +18,8 @@ class Config():
     BLOG_POSTS_PER_PAGE = 25
     BLOG_FOLLOWERS_PER_PAGE = 25
     BLOG_COMMENTS_PER_PAGE = 10
-
+    SLOW_DB_QUERY_TIME=0.5
+    
     @staticmethod
     def init_app(app):
         pass
