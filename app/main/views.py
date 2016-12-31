@@ -9,7 +9,7 @@ from ..models import User, Role, Post, Permission, Follow, Comment
 from ..decorators import admin_required, permission_required
 
 
-@main.after_app_request()
+@main.after_app_request
 def after_request(response):
     for query in get_debug_queries():
         if query.duration >= current_app.config["SLOW_DB_QUERY_TIME"]:
