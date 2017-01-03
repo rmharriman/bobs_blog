@@ -1,4 +1,4 @@
 -r common.txt
 Flask-SSLify==0.1.5
-gunicorn=19.6.0
-gevent=1.2.0
+gunicorn==19.6.0
+gevent==1.2.0
