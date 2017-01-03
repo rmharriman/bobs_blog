@@ -28,7 +28,7 @@ function buildTable(userList) {
 function Menu(elem) {
     this.onUsers = function() {
         var request = new XMLHttpRequest();
-        request.open('GET', 'http://localhost:5000/api/v1.0/users/', true);
+        request.open('GET', 'http://10.0.1.4/api/v1.0/users/', true);
         if (!token) {
             alert("Please get a token first");
             return false;
@@ -56,7 +56,7 @@ function Menu(elem) {
 
     this.onToken = function() {
         var request = new XMLHttpRequest();
-        request.open('GET', 'http://localhost:5000/api/v1.0/token', true);
+        request.open('GET', 'http://10.0.1.4/api/v1.0/token', true);
         request.setRequestHeader("Authorization", "Basic " + btoa("rmharriman@gmail.com:cat"));
         request.onload = function() {
             if (this.status >= 200 && this.status < 400) {
