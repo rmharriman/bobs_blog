@@ -39,8 +39,8 @@ function Menu(elem) {
                 // Success!
                 var data = JSON.parse(this.response);
                 var tableDiv = document.getElementById("users");
+                tableDiv.innerHTML = ""
                 tableDiv.appendChild(buildTable(data.users));
-
             }
             else {
             // We reached our target server, but it returned an error

@@ -21,8 +21,8 @@
 <div class="col-sm-3"></div>
 <div id="users" class="col-sm-9"></div>
 
- <script type=text/javascript>
-  SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+ <script type="text/javascrip" t>
+  SCRIPT_ROOT = {{ request.script_root | tojson }};
  </script>
 
 <script type="text/javascript" src="{{ url_for('static', filename='api.js', _external=True) }}"></script>
