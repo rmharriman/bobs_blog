@@ -1,0 +1,14 @@
+runtime: python
+env: flex
+entrypoint: gunicorn -b :$PORT wsgi:app
+
+runtime_config:
+  python_version: 3
+
+env_variables:
+  FLASK_CONFIG: unix
+  DATABASE_URI: mysql+pymysql://username:password@<host>:/blog_db
+  BLOG_ADMIN: rmharriman@gmail.com
+  MAIL_USERNAME: rmharriman@gmail.com
+  SECRET_KEY: dkajfeourwoeuhsdjhjvzcxbzmvbshfiuehihjdhjfshajdfhieryuhg3849642ilsdjfkshof2328fhwi
+  SSL_DISABLE: 1
