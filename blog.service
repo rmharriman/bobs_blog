@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve the blog
+After=network.target
+
+[Service]
+User=blogger
+Group=www-data
+WorkingDirectory=/srv/bobs_blog
+Environment="PATH=/srv/venv"
+ExecStart=/srv/venv/bin/gunicorn --workers 3 --bind unix:blog.sock -m 007 wsgi:app -k gevent
+
+[Install]
+WantedBy=multi-user.target
