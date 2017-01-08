@@ -7,8 +7,11 @@ runtime_config:
 
 env_variables:
   FLASK_CONFIG: unix
-  DATABASE_URI: mysql+pymysql://username:password@<host>:/blog_db
+  DATABASE_URI: mysql+pymysql://username:password@/blog_db?unix_socket=/cloudsql/acquired-rite-155020:us-east1:blog
   BLOG_ADMIN: rmharriman@gmail.com
   MAIL_USERNAME: rmharriman@gmail.com
   SECRET_KEY: dkajfeourwoeuhsdjhjvzcxbzmvbshfiuehihjdhjfshajdfhieryuhg3849642ilsdjfkshof2328fhwi
   SSL_DISABLE: 1
+
+beta_settings:
+      cloud_sql_instances: acquired-rite-155020:us-east1:blog
