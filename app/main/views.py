@@ -19,6 +19,11 @@ def after_request(response):
     return response
     
 
+@main.route("/_ah/health")
+def health_check():
+    return make_response("success", 200)
+
+
 @main.route("/shutdown")
 def server_shutdown():
     # checks if current app is running in the testing environment
