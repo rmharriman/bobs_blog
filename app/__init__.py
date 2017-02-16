@@ -48,8 +48,8 @@ def create_app(config_name):
     # url_prefix is optional, but causes all routes defined in the bp to be registered with the prefix
     app.register_blueprint(auth_blueprint, url_prefix="/auth")
     
-    from .api_1_0 import api as api_1_0_bluprint
-    app.register_blueprint(api_1_0_bluprint, url_prefix="/api/v1.0")
+    from .api_1_0 import api as api_1_0_blueprint
+    app.register_blueprint(api_1_0_blueprint, url_prefix="/api/v1.0")
     
     # Factory function returns app instance
     return app
